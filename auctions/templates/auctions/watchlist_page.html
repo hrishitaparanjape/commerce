@@ -1,0 +1,32 @@
+{% extends "auctions/layout.html" %}
+
+{% block body %}
+
+<h2>Your Watchlist</h2>
+<ul>
+    {% for listing in watchlist %}
+    <ul>
+        <div style="display: flex; border: 2px solid black;">
+            {% if listing.image_url %}
+            <img src="{{listing.image_url}}" style="max-width: 200px;">
+            {% endif %}
+            <div style="text-align: left; padding: 20px">
+                <a class="nav-link" href="{% url 'listings_page' %}?title={{listing.title}}"
+                    style="color:indigo; font-weight:bold; font-size: 25px">{{listing.title}}</a>
+                <p>Description: {{listing.description}}</p>
+                <h6>Current Bid: ${{listing.initial_bid}}</h6>
+                <h6>Posted by: {{listing.user.username}}</h6>
+            </div>
+            <form action="{% url 'watchlist_page' %}" method="post" style="display:inline;">
+                {% csrf_token %}
+                <input type="hidden" name="listing_id" value="{{ listing.id }}">
+                <input type="hidden" name="action" value="remove_from_watchlist">
+                <button type="submit" style="margin-top: 100px">Remove from Watchlist</button>
+            </form>
+        </div>
+    </ul>
+    {% empty %}
+    <p>Your watchlist is empty.
+    <p>
+        {% endfor %}
+        {% endblock %}

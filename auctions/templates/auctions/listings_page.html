@@ -1,0 +1,60 @@
+{% extends "auctions/layout.html" %}
+
+{% block body %}
+{% for listing in filtered_listing_by_id %}
+<h2 style="font-size: 35px">{{listing.title}}</h2>
+{% if listing.image_url %}
+<img src="{{listing.image_url}}" style="max-width: 350px; display: block; margin: auto;">
+{% endif %}
+<br><br>
+<div style="text-align: left; padding: 20px">
+    <h4>{{listing.title}}</h4>
+    <p>Description: {{listing.description}}</p>
+    <h6>Current Bid: ${{listing.initial_bid}}</h6>
+    <h6>Posted by: {{listing.user.username}}</h6>
+    <br>
+    {% if user.username == listing.user.username %}
+    <form action="{% url 'listings_page' %}" method="post" style="display:inline;">
+        {% csrf_token %}
+        <input type="hidden" name="listing_id" value="{{ listing.id }}">
+        <button type="submit" name="action" value="delete">Delete Listing</button>
+    </form>
+    {% endif %}
+    {% if user.username != listing.user.username %}
+    <form action="{% url 'listings_page' %}" method="post" style="display:inline;">
+        {% csrf_token %}
+        <input type="hidden" name="listing_id" value="{{ listing.id }}">
+        <button type="submit" name="action" value="add_to_watch_list">Add to Watchlist</button>
+        <label style="color: red; font-size: small;">{{action_finished}}</label>
+    </form>
+    {% endif %}
+</div>
+{% endfor %}
+<form method="post">
+    {% csrf_token %}
+
+    <label for="new_bid">New Bid:</label>
+    <input type="number" id="initial_bid" name="initial_bid" min="{{initial_bid|add:1}}" required> <br>
+
+    <button type="submit">Place New bid</button>
+</form> <br>
+
+
+
+<form method="post">
+    {% csrf_token %}
+
+    <label for="comment">Comment:</label>
+    <input type="text" id="comment" name="comment" required> <br>
+
+    <button type="submit">Comment</button>
+</form>
+<h3>Comments on this listings</h3> <br>
+{%for comment in comment_filtered %}
+<ul>
+    <div style="display: flex; border: 2px solid indigo; padding: 10px">
+        <p>{{comment.user.username}} commented: {{comment.content}}</p>
+    </div>
+</ul>
+{% endfor %}
+{% endblock %}
